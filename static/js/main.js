@@ -3,7 +3,7 @@ let cart = [];
 
 function addToCart(productId, name, price) {
     const existingItem = cart.find(item => item.productId === productId);
-    
+
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
@@ -14,16 +14,16 @@ function addToCart(productId, name, price) {
             quantity: 1
         });
     }
-    
+
     updateCartDisplay();
 }
 
 function updateCartDisplay() {
     const cartTable = document.getElementById('cartTable');
     const totalElement = document.getElementById('total');
-    
+
     if (!cartTable) return;
-    
+
     cartTable.innerHTML = cart.map(item => `
         <tr>
             <td>${item.name}</td>
@@ -37,7 +37,7 @@ function updateCartDisplay() {
             </td>
         </tr>
     `).join('');
-    
+
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     totalElement.textContent = `$${total.toFixed(2)}`;
 }
@@ -52,9 +52,9 @@ function checkout() {
         alert('Cart is empty!');
         return;
     }
-    
+
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+
     fetch('/api/transactions', {
         method: 'POST',
         headers: {
@@ -69,6 +69,8 @@ function checkout() {
     .then(data => {
         if (data.status === 'success') {
             alert('Transaction completed successfully!');
+            // Redirect to invoice page
+            window.location.href = `/invoice/${data.transaction_id}`;
             cart = [];
             updateCartDisplay();
         }
@@ -82,14 +84,14 @@ function checkout() {
 // Product management
 function addProduct(event) {
     event.preventDefault();
-    
+
     const formData = new FormData(event.target);
     const product = {
         name: formData.get('name'),
         price: formData.get('price'),
         stock: formData.get('stock')
     };
-    
+
     fetch('/api/products', {
         method: 'POST',
         headers: {

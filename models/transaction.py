@@ -10,7 +10,10 @@ class TransactionItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price_at_time = db.Column(db.Float, nullable=False)
-    
+
+    # Add relationship to Product for invoice details
+    product = db.relationship('Product', backref='transaction_items')
+
     def __repr__(self):
         return f'<TransactionItem {self.id}>'
 
@@ -25,7 +28,7 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     total = db.Column(db.Float, nullable=False)
-    
+
     # Relationship with TransactionItem
     items = db.relationship('TransactionItem', backref='transaction', lazy=True,
                           cascade='all, delete-orphan')

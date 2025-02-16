@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2>INVOICE</h2>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-6">
+                    <h6 class="text-muted">Invoice Number:</h6>
+                    <h5>INV-{{ transaction.id }}</h5>
+                </div>
+                <div class="col-6 text-end">
+                    <h6 class="text-muted">Date:</h6>
+                    <h5>{{ transaction.date.strftime('%Y-%m-%d %H:%M') }}</h5>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Price</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in transaction.items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">${{ "%.2f"|format(item.price_at_time) }}</td>
+                                <td class="text-end">${{ "%.2f"|format(item.get_subtotal()) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td class="text-end"><strong>${{ "%.2f"|format(transaction.total) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <p class="text-center text-muted mb-0">Thank you for your business!</p>
+                </div>
+            </div>
+
+            <div class="row mt-4 no-print">
+                <div class="col-12 text-center">
+                    <button onclick="window.print()" class="btn btn-primary">
+                        <i class="fas fa-print me-2"></i>Print Invoice
+                    </button>
+                    <a href="{{ url_for('billing') }}" class="btn btn-secondary ms-2">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Billing
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

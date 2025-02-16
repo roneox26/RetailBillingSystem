@@ -89,6 +89,11 @@ def handle_products():
 
     return jsonify([p.to_dict() for p in Product.query.all()])
 
+@app.route('/invoice/<int:transaction_id>')
+def invoice(transaction_id):
+    transaction = Transaction.query.get_or_404(transaction_id)
+    return render_template('invoice.html', transaction=transaction)
+
 @app.route('/api/transactions', methods=['POST'])
 def create_transaction():
     try:
@@ -113,7 +118,10 @@ def create_transaction():
 
         db.session.add(transaction)
         db.session.commit()
-        return jsonify({'status': 'success'})
+        return jsonify({
+            'status': 'success',
+            'transaction_id': transaction.id
+        })
     except Exception as e:
         db.session.rollback()
         logging.error(f"Error creating transaction: {str(e)}")
