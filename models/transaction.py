@@ -12,7 +12,7 @@ class TransactionItem(db.Model):
     price_at_time = db.Column(db.Float, nullable=False)
 
     # Add relationship to Product for invoice details
-    product = db.relationship('Product', backref='transaction_items')
+    product = db.relationship('Product')
 
     def __repr__(self):
         return f'<TransactionItem {self.id}>'
