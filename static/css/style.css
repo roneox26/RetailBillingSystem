@@ -1,0 +1,68 @@
+:root {
+    --primary: #2D3436;
+    --secondary: #0984E3;
+    --success: #00B894;
+    --warning: #FDCB6E;
+    --background: #F5F6FA;
+    --text: #2D3436;
+}
+
+body {
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.navbar {
+    background-color: var(--primary);
+}
+
+.navbar-brand, .nav-link {
+    color: white !important;
+}
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.btn-success {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+
+.table {
+    background-color: white;
+    border-radius: 8px;
+}
+
+.table th {
+    background-color: var(--primary);
+    color: white;
+}
+
+.billing-form {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.stats-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--secondary);
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+}
