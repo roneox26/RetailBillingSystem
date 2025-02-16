@@ -3,41 +3,47 @@
 {% block content %}
 <div class="row">
     <div class="col-md-12 text-center mb-4">
-        <h1>Welcome to Retail POS System</h1>
-        <p class="lead">Manage your retail store with ease</p>
+        <h1 class="welcome-header">Welcome to Retail POS System</h1>
+        <p class="lead welcome-text">Manage your retail store with ease</p>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <div class="card">
+    <div class="col-md-4 feature-card">
+        <div class="card h-100">
             <div class="card-body text-center">
-                <i class="fas fa-receipt fa-3x mb-3 text-primary"></i>
+                <i class="fas fa-receipt fa-3x mb-3 text-primary feature-icon"></i>
                 <h5 class="card-title">Billing</h5>
-                <p class="card-text">Create new bills and manage transactions</p>
-                <a href="{{ url_for('billing') }}" class="btn btn-primary">Go to Billing</a>
+                <p class="card-text">Create new bills and manage transactions with our intuitive interface</p>
+                <a href="{{ url_for('billing') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-right me-2"></i>Go to Billing
+                </a>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card">
+
+    <div class="col-md-4 feature-card">
+        <div class="card h-100">
             <div class="card-body text-center">
-                <i class="fas fa-box fa-3x mb-3 text-success"></i>
+                <i class="fas fa-box fa-3x mb-3 text-success feature-icon"></i>
                 <h5 class="card-title">Inventory</h5>
-                <p class="card-text">Manage your product inventory</p>
-                <a href="{{ url_for('inventory') }}" class="btn btn-success">Manage Inventory</a>
+                <p class="card-text">Track and manage your product inventory efficiently</p>
+                <a href="{{ url_for('inventory') }}" class="btn btn-success">
+                    <i class="fas fa-boxes me-2"></i>Manage Inventory
+                </a>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card">
+
+    <div class="col-md-4 feature-card">
+        <div class="card h-100">
             <div class="card-body text-center">
-                <i class="fas fa-chart-bar fa-3x mb-3 text-warning"></i>
+                <i class="fas fa-chart-bar fa-3x mb-3 text-warning feature-icon"></i>
                 <h5 class="card-title">Reports</h5>
-                <p class="card-text">View sales reports and analytics</p>
-                <a href="{{ url_for('reports') }}" class="btn btn-warning">View Reports</a>
+                <p class="card-text">Get detailed insights with comprehensive sales reports</p>
+                <a href="{{ url_for('reports') }}" class="btn btn-warning">
+                    <i class="fas fa-chart-line me-2"></i>View Reports
+                </a>
             </div>
         </div>
     </div>
