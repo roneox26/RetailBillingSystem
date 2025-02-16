@@ -145,3 +145,38 @@ body {
         display: none;
     }
 }
+
+/* Prediction tooltip styles */
+.prediction-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prediction-icon {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.prediction-icon:hover {
+    transform: scale(1.1);
+}
+
+.prediction-status {
+    font-size: 0.8rem;
+    color: var(--text);
+    opacity: 0.8;
+}
+
+/* Add these to the existing color variables */
+.text-success {
+    color: var(--success) !important;
+}
+
+.text-warning {
+    color: var(--warning) !important;
+}
+
+.text-danger {
+    color: #FF6B6B !important;
+}

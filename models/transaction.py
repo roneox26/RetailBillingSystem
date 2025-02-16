@@ -1,5 +1,5 @@
-from app import db
 from datetime import datetime
+from app import db
 
 class TransactionItem(db.Model):
     """Model for individual items in a transaction"""

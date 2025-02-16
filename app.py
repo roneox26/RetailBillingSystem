@@ -50,6 +50,9 @@ with app.app_context():
         logger.error(f"Failed to create database tables: {str(e)}")
         raise
 
+# Import PredictionService after models are loaded
+from services.prediction_service import PredictionService
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -126,6 +129,16 @@ def create_transaction():
         db.session.rollback()
         logging.error(f"Error creating transaction: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 400
+
+@app.route('/api/inventory/predict/<int:product_id>')
+def predict_inventory(product_id):
+    """Get inventory predictions for a product"""
+    try:
+        prediction = PredictionService.predict_future_stock(product_id)
+        return jsonify(prediction)
+    except Exception as e:
+        logging.error(f"Error predicting inventory: {str(e)}")
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
