@@ -22,12 +22,24 @@ app.secret_key = os.environ.get("SESSION_SECRET")
 # Configure the database
 database_url = os.environ.get("DATABASE_URL")
 if not database_url:
-    raise RuntimeError(
-        "No DATABASE_URL environment variable set. "
-        "Please ensure your database configuration is correct."
-    )
+    # Build URL from individual components if DATABASE_URL is not set
+    pg_user = os.environ.get("PGUSER")
+    pg_password = os.environ.get("PGPASSWORD")
+    pg_host = os.environ.get("PGHOST")
+    pg_port = os.environ.get("PGPORT")
+    pg_database = os.environ.get("PGDATABASE")
+    
+    if all([pg_user, pg_password, pg_host, pg_port, pg_database]):
+        database_url = f"postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_database}"
+    else:
+        raise RuntimeError(
+            "No DATABASE_URL or complete PostgreSQL environment variables set. "
+            "Please ensure your database configuration is correct."
+        )
 
-logger.info(f"Initializing database with URI: {database_url.split('@')[1]}")  # Log only host/db part
+# Only log the non-sensitive part of the URL to avoid exposing credentials
+safe_db_url = database_url.split('@')[1] if '@' in database_url else "unknown"
+logger.info(f"Initializing database with URI host/db: {safe_db_url}")  
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
