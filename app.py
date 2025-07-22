@@ -44,6 +44,13 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
+    "pool_timeout": 20,
+    "pool_size": 10,
+    "max_overflow": 20,
+    "connect_args": {
+        "sslmode": "require",
+        "connect_timeout": 10
+    }
 }
 
 # Initialize the database
@@ -89,11 +96,10 @@ def handle_products():
     if request.method == 'POST':
         try:
             data = request.get_json()
-            product = Product(
-                name=data['name'],
-                price=float(data['price']),
-                stock=int(data['stock'])
-            )
+            product = Product()
+            product.name = data['name']
+            product.price = float(data['price'])
+            product.stock = int(data['stock'])
             db.session.add(product)
             db.session.commit()
             return jsonify({'status': 'success'})
@@ -113,7 +119,8 @@ def invoice(transaction_id):
 def create_transaction():
     try:
         data = request.get_json()
-        transaction = Transaction(total=float(data['total']))
+        transaction = Transaction()
+        transaction.total = float(data['total'])
 
         for item_data in data['items']:
             product = Product.query.get(item_data['productId'])
@@ -124,11 +131,10 @@ def create_transaction():
             product.update_stock(-item_data['quantity'])
 
             # Create transaction item
-            transaction_item = TransactionItem(
-                product_id=product.id,
-                quantity=item_data['quantity'],
-                price_at_time=product.price
-            )
+            transaction_item = TransactionItem()
+            transaction_item.product_id = product.id
+            transaction_item.quantity = item_data['quantity']
+            transaction_item.price_at_time = product.price
             transaction.items.append(transaction_item)
 
         db.session.add(transaction)
