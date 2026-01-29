@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: retail-billing-system
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd RetailBillingSystem && gunicorn wsgi:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.1
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
