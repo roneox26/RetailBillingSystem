@@ -1,1 +1,1 @@
-web: cd RetailBillingSystem && gunicorn wsgi:app
+web: gunicorn --chdir RetailBillingSystem --config RetailBillingSystem/gunicorn.conf.py wsgi:app
