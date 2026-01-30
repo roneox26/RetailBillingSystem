@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app
+web: cd RetailBillingSystem && gunicorn wsgi:app
