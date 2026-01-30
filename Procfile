@@ -1,1 +1,1 @@
-web: gunicorn --chdir RetailBillingSystem --config RetailBillingSystem/gunicorn.conf.py wsgi:app
+web: cd RetailBillingSystem && gunicorn --bind 0.0.0.0:$PORT wsgi:app
