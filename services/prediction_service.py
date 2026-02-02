@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from datetime import datetime, timedelta
 from models.transaction import Transaction, TransactionItem
 from models.product import Product
-from app import db
+from db import db
 
 class PredictionService:
     @staticmethod

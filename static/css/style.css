@@ -3,8 +3,15 @@
     --secondary: #0984E3;
     --success: #00B894;
     --warning: #FDCB6E;
+    --danger: #FF6B6B;
     --background: #F5F6FA;
     --text: #2D3436;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -15,37 +22,51 @@ body {
 }
 
 .navbar {
-    background-color: var(--primary);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, var(--primary) 0%, #1e272e 100%);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .navbar-brand, .nav-link {
     color: white !important;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.navbar-brand:hover, .nav-link:hover {
-    opacity: 0.8;
+.nav-link {
+    margin: 0 0.5rem;
+    border-radius: 8px;
+    padding: 0.5rem 1rem !important;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
 }
 
 .card {
     border: none;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.07);
     margin-bottom: 1.5rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
     background: white;
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
 .card-header {
     background-color: transparent;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 2px solid rgba(0,0,0,0.05);
     padding: 1.25rem;
+    font-weight: 600;
 }
 
 .card-body {
@@ -54,25 +75,37 @@ body {
 
 .btn {
     border-radius: 8px;
-    padding: 0.5rem 1.25rem;
+    padding: 0.6rem 1.5rem;
     font-weight: 500;
     transition: all 0.3s ease;
+    border: none;
 }
 
 .btn-primary {
-    background-color: var(--secondary);
-    border-color: var(--secondary);
+    background: linear-gradient(135deg, var(--secondary) 0%, #0770c5 100%);
 }
 
 .btn-primary:hover {
-    background-color: #0770c5;
-    border-color: #0770c5;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);
 }
 
 .btn-success {
-    background-color: var(--success);
-    border-color: var(--success);
+    background: linear-gradient(135deg, var(--success) 0%, #00a383 100%);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #ee5a52 100%);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
 }
 
 .table {
@@ -82,28 +115,103 @@ body {
 }
 
 .table th {
-    background-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, #1e272e 100%);
     color: white;
     font-weight: 500;
     border: none;
+    padding: 1rem;
 }
 
 .table td {
     vertical-align: middle;
     border-color: rgba(0,0,0,0.05);
+    padding: 1rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(9, 132, 227, 0.05);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
 }
 
 .stats-card {
-    background-color: white;
+    background: white;
     padding: 2rem;
     border-radius: 12px;
     border-left: 4px solid var(--secondary);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(9, 132, 227, 0.1) 0%, transparent 100%);
+    border-radius: 0 0 0 100%;
 }
 
 .stats-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.stats-card i {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    opacity: 0.2;
+}
+
+.badge {
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid #e1e8ed;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 0.2rem rgba(9, 132, 227, 0.15);
+}
+
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #1e272e 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.pagination .page-link {
+    border-radius: 8px;
+    margin: 0 0.2rem;
+    border: none;
+    color: var(--secondary);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--secondary) 0%, #0770c5 100%);
+    border: none;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
 }
 
 .welcome-header {
@@ -163,17 +271,15 @@ body {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
+    0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
 }
 
-/* Print styles */
 @media print {
     .no-print { display: none; }
+    body { background: white; }
 }
 
-/* Prediction tooltip styles */
 .prediction-container {
     display: flex;
     align-items: center;
@@ -186,7 +292,7 @@ body {
 }
 
 .prediction-icon:hover {
-    transform: scale(1.1);
+    transform: scale(1.2);
 }
 
 .prediction-status {
@@ -197,4 +303,16 @@ body {
 
 .text-success { color: var(--success) !important; }
 .text-warning { color: var(--warning) !important; }
-.text-danger { color: #FF6B6B !important; }
+.text-danger { color: var(--danger) !important; }
+
+@media (max-width: 768px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+    .welcome-header {
+        font-size: 2rem;
+    }
+    .table {
+        font-size: 0.9rem;
+    }
+}

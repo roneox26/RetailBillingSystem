@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h6 class="text-muted">Total Products</h6>
+            <h2 class="mb-0">{{ total_products }}</h2>
+            <i class="fas fa-box fa-2x text-primary"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card" style="border-left-color: #FF6B6B;">
+            <h6 class="text-muted">Low Stock Items</h6>
+            <h2 class="mb-0 text-danger">{{ low_stock }}</h2>
+            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card" style="border-left-color: #00B894;">
+            <h6 class="text-muted">Today's Sales</h6>
+            <h2 class="mb-0">৳{{ "%.2f"|format(today_sales) }}</h2>
+            <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card" style="border-left-color: #FDCB6E;">
+            <h6 class="text-muted">Week Sales</h6>
+            <h2 class="mb-0">৳{{ "%.2f"|format(week_sales) }}</h2>
+            <i class="fas fa-calendar-week fa-2x text-warning"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-receipt"></i> Recent Transactions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_transactions %}
+                            <tr>
+                                <td>#{{ transaction.id }}</td>
+                                <td>{{ transaction.date.strftime('%d %b %Y %I:%M %p') }}</td>
+                                <td>{{ transaction.items|length }} items</td>
+                                <td><strong>৳{{ "%.2f"|format(transaction.total) }}</strong></td>
+                                <td>
+                                    <a href="{{ url_for('invoice', transaction_id=transaction.id) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-file-invoice"></i> Invoice
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No transactions yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

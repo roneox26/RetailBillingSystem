@@ -1,117 +1,197 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Product Inventory</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Prediction</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for product in products %}
-                            <tr>
-                                <td>{{ product.id }}</td>
-                                <td>{{ product.name }}</td>
-                                <td>${{ product.price }}</td>
-                                <td>{{ product.stock }}</td>
-                                <td>
-                                    <div class="prediction-container" id="prediction-{{ product.id }}">
-                                        <i class="fas fa-chart-line prediction-icon" 
-                                           data-bs-toggle="tooltip" 
-                                           data-bs-placement="right"
-                                           title="Loading prediction..."></i>
-                                        <div class="prediction-status"></div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2><i class="fas fa-boxes"></i> Product Inventory</h2>
     </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="fas fa-plus"></i> Add Product
+        </button>
+    </div>
+</div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Add New Product</h5>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search products..." value="{{ search }}">
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Prediction</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>৳{{ "%.2f"|format(product.price) }}</td>
+                        <td>
+                            <span class="badge {% if product.stock < 10 %}bg-danger{% elif product.stock < 50 %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="prediction-container" id="prediction-{{ product.id }}">
+                                <i class="fas fa-chart-line prediction-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Loading..."></i>
+                                <small class="prediction-status"></small>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editProduct({{ product.id }})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct({{ product.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if pagination %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.prev_num }}&search={{ search }}">Previous</a></li>
+                {% endif %}
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                    <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}&search={{ search }}">{{ page }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.next_num }}&search={{ search }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="card-body">
-                <form onsubmit="addProduct(event)">
+            <form onsubmit="addProduct(event)">
+                <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Product Name</label>
                         <input type="text" class="form-control" name="name" required>
                     </div>
-                    
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
+                        <label class="form-label">Price (৳)</label>
                         <input type="number" class="form-control" name="price" step="0.01" required>
                     </div>
-                    
                     <div class="mb-3">
                         <label class="form-label">Initial Stock</label>
                         <input type="number" class="form-control" name="stock" required>
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Add Product</button>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addProductBtn">Add Product</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', debounceSearch(function() {
+    window.location.href = `?search=${this.value}`;
+}));
 
-    // Load predictions for each product
+function addProduct(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = document.getElementById('addProductBtn');
+    showLoading(btn);
+    
+    fetch('/api/products', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: form.name.value,
+            price: form.price.value,
+            stock: form.stock.value
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoading(btn);
+        if (data.status === 'success') {
+            showToast('Product added successfully!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Error adding product', 'danger');
+        }
+    })
+    .catch(() => {
+        hideLoading(btn);
+        showToast('Network error', 'danger');
+    });
+}
+
+function deleteProduct(id) {
+    if (!confirmAction('Delete this product?')) return;
+    
+    fetch(`/api/products/${id}`, {method: 'DELETE'})
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Product deleted', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message, 'danger');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
     document.querySelectorAll('.prediction-container').forEach(container => {
         const productId = container.id.split('-')[1];
         const icon = container.querySelector('.prediction-icon');
         const status = container.querySelector('.prediction-status');
 
         fetch(`/api/inventory/predict/${productId}`)
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 if (data.error) {
-                    icon.title = 'Error loading prediction';
-                    icon.classList.add('text-danger');
+                    icon.classList.add('text-muted');
                     return;
                 }
-
-                icon.title = data.message;
-                status.textContent = `${data.prediction} units needed`;
-
-                // Update icon color based on confidence
-                if (data.confidence >= 70) {
-                    icon.classList.add('text-success');
-                } else if (data.confidence >= 40) {
-                    icon.classList.add('text-warning');
-                } else {
-                    icon.classList.add('text-danger');
-                }
+                icon.setAttribute('data-bs-original-title', data.message);
+                status.textContent = `${data.prediction} needed`;
+                icon.classList.add(data.confidence >= 70 ? 'text-success' : data.confidence >= 40 ? 'text-warning' : 'text-danger');
             })
-            .catch(error => {
-                icon.title = 'Error loading prediction';
-                icon.classList.add('text-danger');
-            });
+            .catch(() => icon.classList.add('text-muted'));
     });
 });
 </script>

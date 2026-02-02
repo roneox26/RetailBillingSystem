@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from app import app, db
 from models.product import Product
 from models.transaction import Transaction, TransactionItem
+from models.user import Organization
 
 def clear_existing_data():
     """Clear existing data from the database."""
@@ -15,6 +16,18 @@ def clear_existing_data():
     Product.query.delete()
     db.session.commit()
     print("Existing data cleared.")
+
+def create_organization():
+    """Create default organization."""
+    org = Organization.query.get(1)
+    if not org:
+        org = Organization()
+        org.id = 1
+        org.name = "Default Store"
+        db.session.add(org)
+        db.session.commit()
+        print("Created default organization.")
+    return org
 
 def create_sample_products():
     """Create sample products."""
@@ -26,60 +39,70 @@ def create_sample_products():
     p1.name = "Coffee"
     p1.price = 3.50
     p1.stock = 100
+    p1.organization_id = 1
     products.append(p1)
     
     p2 = Product()
     p2.name = "Tea"
     p2.price = 2.50
     p2.stock = 150
+    p2.organization_id = 1
     products.append(p2)
     
     p3 = Product()
     p3.name = "Sandwich"
     p3.price = 5.99
     p3.stock = 30
+    p3.organization_id = 1
     products.append(p3)
     
     p4 = Product()
     p4.name = "Salad"
     p4.price = 7.99
     p4.stock = 20
+    p4.organization_id = 1
     products.append(p4)
     
     p5 = Product()
     p5.name = "Muffin"
     p5.price = 2.99
     p5.stock = 40
+    p5.organization_id = 1
     products.append(p5)
     
     p6 = Product()
     p6.name = "Cookie"
     p6.price = 1.99
     p6.stock = 50
+    p6.organization_id = 1
     products.append(p6)
     
     p7 = Product()
     p7.name = "Water Bottle"
     p7.price = 1.50
     p7.stock = 200
+    p7.organization_id = 1
     products.append(p7)
     
     p8 = Product()
     p8.name = "Juice"
     p8.price = 3.99
     p8.stock = 75
+    p8.organization_id = 1
     products.append(p8)
     
     p9 = Product()
     p9.name = "Energy Bar"
     p9.price = 2.49
     p9.stock = 60
+    p9.organization_id = 1
     products.append(p9)
     
     p10 = Product()
     p10.name = "Chips"
     p10.price = 1.79
     p10.stock = 85
+    p10.organization_id = 1
     products.append(p10)
     
     db.session.add_all(products)
@@ -108,6 +131,7 @@ def create_sample_transactions(products, num_transactions=15):
         transaction = Transaction()
         transaction.date = transaction_date
         transaction.total = 0  # Initial value, will update later
+        transaction.organization_id = 1
         
         # Add items to the transaction
         total = 0
@@ -139,6 +163,7 @@ def create_sample_transactions(products, num_transactions=15):
 def main():
     """Main function to populate the database."""
     with app.app_context():
+        create_organization()
         clear_existing_data()
         products = create_sample_products()
         create_sample_transactions(products)

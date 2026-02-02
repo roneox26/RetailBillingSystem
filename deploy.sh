@@ -1,0 +1,21 @@
+#!/bin/bash
+# Quick Deployment Script for Render
+
+echo "🚀 Deploying to Render..."
+echo ""
+echo "✅ Files configured:"
+echo "   - gunicorn.conf.py"
+echo "   - Procfile"
+echo "   - render.yaml"
+echo ""
+echo "📝 Next steps:"
+echo "1. git add ."
+echo "2. git commit -m 'Fixed Render deployment'"
+echo "3. git push origin main"
+echo ""
+echo "4. Go to Render Dashboard:"
+echo "   https://dashboard.render.com"
+echo ""
+echo "5. Click 'Manual Deploy' > 'Clear build cache & deploy'"
+echo ""
+echo "✨ Your app will be live soon!"

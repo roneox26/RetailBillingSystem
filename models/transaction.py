@@ -1,5 +1,5 @@
 from datetime import datetime
-from app import db
+from db import db
 
 class TransactionItem(db.Model):
     """Model for individual items in a transaction"""
@@ -11,7 +11,6 @@ class TransactionItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price_at_time = db.Column(db.Float, nullable=False)
 
-    # Add relationship to Product for invoice details
     product = db.relationship('Product')
 
     def __repr__(self):
@@ -27,9 +26,14 @@ class Transaction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    subtotal = db.Column(db.Float, nullable=False, default=0)
+    discount_percent = db.Column(db.Float, default=0)
+    discount_amount = db.Column(db.Float, default=0)
+    vat_percent = db.Column(db.Float, default=0)
+    vat_amount = db.Column(db.Float, default=0)
     total = db.Column(db.Float, nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
 
-    # Relationship with TransactionItem
     items = db.relationship('TransactionItem', backref='transaction', lazy=True,
                           cascade='all, delete-orphan')
 
@@ -47,10 +51,17 @@ class Transaction(db.Model):
                 'price': float(item.price_at_time),
                 'subtotal': float(item.get_subtotal())
             } for item in self.items],
+            'subtotal': float(self.subtotal),
+            'discount_percent': float(self.discount_percent),
+            'discount_amount': float(self.discount_amount),
+            'vat_percent': float(self.vat_percent),
+            'vat_amount': float(self.vat_amount),
             'total': float(self.total)
         }
 
     def calculate_total(self):
         """Calculate total for the entire transaction"""
-        self.total = sum(item.get_subtotal() for item in self.items)
+        self.subtotal = sum(item.get_subtotal() for item in self.items)
+        after_discount = self.subtotal - self.discount_amount
+        self.total = after_discount + self.vat_amount
         return self.total

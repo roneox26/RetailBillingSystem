@@ -1,5 +1,5 @@
-from app import db
 from datetime import datetime
+from db import db
 
 class Product(db.Model):
     """Model for products in inventory"""
@@ -9,6 +9,7 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False, default=0)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

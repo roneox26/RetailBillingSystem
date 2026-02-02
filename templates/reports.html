@@ -1,63 +1,86 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="stats-card">
-            <h3 class="mb-2">Total Sales</h3>
-            <h4 class="text-primary">
-                ${{ transactions|sum(attribute='total') }}
-            </h4>
-        </div>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2><i class="fas fa-file-alt"></i> Reports</h2>
     </div>
-    
-    <div class="col-md-4">
-        <div class="stats-card">
-            <h3 class="mb-2">Transactions</h3>
-            <h4 class="text-primary">
-                {{ transactions|length }}
-            </h4>
-        </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-success" onclick="exportTableToCSV('reportsTable', 'transactions.csv')">
+            <i class="fas fa-download"></i> Export CSV
+        </button>
     </div>
-    
-    <div class="col-md-4">
-        <div class="stats-card">
-            <h3 class="mb-2">Average Sale</h3>
-            <h4 class="text-primary">
-                ${{ (transactions|sum(attribute='total') / transactions|length)|round(2) if transactions|length > 0 else 0 }}
-            </h4>
-        </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">From Date</label>
+                <input type="date" name="date_from" class="form-control" value="{{ request.args.get('date_from', '') }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">To Date</label>
+                <input type="date" name="date_to" class="form-control" value="{{ request.args.get('date_to', '') }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i> Filter</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Transaction History</h5>
-        <input type="text" class="form-control w-auto" placeholder="Search transactions..." id="searchTransactions">
-    </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover" id="reportsTable">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Date</th>
                         <th>Items</th>
                         <th>Total</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for transaction in transactions %}
                     <tr>
-                        <td>{{ transaction.id }}</td>
-                        <td>{{ transaction.date }}</td>
-                        <td>{{ transaction.items }}</td>
-                        <td>${{ transaction.total }}</td>
+                        <td>#{{ transaction.id }}</td>
+                        <td>{{ transaction.date.strftime('%d %b %Y %I:%M %p') }}</td>
+                        <td><span class="badge bg-info">{{ transaction.items|length }} items</span></td>
+                        <td><strong>৳{{ "%.2f"|format(transaction.total) }}</strong></td>
+                        <td>
+                            <a href="{{ url_for('invoice', transaction_id=transaction.id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-file-invoice"></i> Invoice
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        
+        {% if pagination %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.prev_num }}">Previous</a></li>
+                {% endif %}
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                    <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.next_num }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
