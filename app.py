@@ -412,9 +412,7 @@ def get_alerts():
         'out_of_stock': [p.to_dict() for p in out_of_stock],
     })
 
-# ── Prediction ───────────────────────────────────────────────────────────────
-
-from services.prediction_service import PredictionService
+# ── Prediction ───────────────────────────────────────────────────────────
 
 @app.route('/api/inventory/predict/<int:product_id>')
 @login_required
@@ -422,11 +420,14 @@ def predict_inventory(product_id):
     org_id = session.get('org_id')
     product = Product.query.filter_by(id=product_id, organization_id=org_id).first_or_404()
     try:
+        from services.prediction_service import PredictionService
         prediction = PredictionService.predict_future_stock(product.id)
         return jsonify(prediction)
+    except ImportError:
+        return jsonify({'error': 'Prediction service not available', 'prediction': 0, 'confidence': 0}), 200
     except Exception as e:
         logger.error(f'Prediction error for product {product_id}: {str(e)}')
-        return jsonify({'error': 'Prediction failed'}), 500
+        return jsonify({'error': 'Prediction failed', 'prediction': 0, 'confidence': 0}), 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
