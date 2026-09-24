@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2><i class="fas fa-boxes"></i> Product Inventory</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="fas fa-plus"></i> Add Product
+        </button>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search products..." value="{{ search }}">
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Batch No</th>
+                        <th>Expiry Date</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Prediction</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>
+                            <strong>{{ product.name }}</strong>
+                            {% if product.generic_name %}<br><small class="text-muted">{{ product.generic_name }}</small>{% endif %}
+                        </td>
+                        <td><span class="badge bg-secondary">{{ product.category }}</span></td>
+                        <td>{{ product.batch_no or '-' }}</td>
+                        <td>
+                            {% if product.expiry_date %}
+                                {% if product.is_expired %}
+                                    <span class="badge bg-danger">{{ product.expiry_date }} মেয়াদোত্তীর্ণ</span>
+                                {% elif product.is_expiring_soon %}
+                                    <span class="badge bg-warning text-dark">{{ product.expiry_date }}</span>
+                                {% else %}
+                                    <span class="text-success">{{ product.expiry_date }}</span>
+                                {% endif %}
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>৳{{ "%.2f"|format(product.price) }}</td>
+                        <td>
+                            <span class="badge {% if product.stock < 10 %}bg-danger{% elif product.stock < 50 %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="prediction-container" id="prediction-{{ product.id }}">
+                                <i class="fas fa-chart-line prediction-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Loading..."></i>
+                                <small class="prediction-status"></small>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editProduct({{ product.id }})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct({{ product.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if pagination %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.prev_num }}&search={{ search }}">Previous</a></li>
+                {% endif %}
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                    <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}&search={{ search }}">{{ page }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.next_num }}&search={{ search }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form onsubmit="addProduct(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Product Name *</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category">
+                                <option value="Tablet">Tablet</option>
+                                <option value="Capsule">Capsule</option>
+                                <option value="Syrup">Syrup</option>
+                                <option value="Injection">Injection</option>
+                                <option value="Cream/Ointment">Cream/Ointment</option>
+                                <option value="Eye/Ear Drop">Eye/Ear Drop</option>
+                                <option value="Inhaler">Inhaler</option>
+                                <option value="Powder">Powder</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Generic Name</label>
+                            <input type="text" class="form-control" name="generic_name">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Manufacturer</label>
+                            <input type="text" class="form-control" name="manufacturer">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Batch No</label>
+                            <input type="text" class="form-control" name="batch_no">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" name="expiry_date">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Purchase Price (৳)</label>
+                            <input type="number" class="form-control" name="purchase_price" step="0.01">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Sale Price (৳) *</label>
+                            <input type="number" class="form-control" name="price" step="0.01" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Stock *</label>
+                            <input type="number" class="form-control" name="stock" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reorder Level</label>
+                        <input type="number" class="form-control" name="reorder_level" value="10">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addProductBtn">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', debounceSearch(function() {
+    window.location.href = `?search=${this.value}`;
+}));
+
+function addProduct(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = document.getElementById('addProductBtn');
+    showLoading(btn);
+
+    fetch('/api/products', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: form.name.value,
+            generic_name: form.generic_name.value,
+            category: form.category.value,
+            manufacturer: form.manufacturer.value,
+            batch_no: form.batch_no.value,
+            expiry_date: form.expiry_date.value,
+            price: form.price.value,
+            purchase_price: form.purchase_price.value,
+            stock: form.stock.value,
+            reorder_level: form.reorder_level.value
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        hideLoading(btn);
+        if (data.status === 'success') {
+            showToast('Product added successfully!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Error adding product', 'danger');
+        }
+    })
+    .catch(() => {
+        hideLoading(btn);
+        showToast('Network error', 'danger');
+    });
+}
+
+function deleteProduct(id) {
+    if (!confirmAction('Delete this product?')) return;
+    
+    fetch(`/api/products/${id}`, {method: 'DELETE'})
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Product deleted', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message, 'danger');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
+    document.querySelectorAll('.prediction-container').forEach(container => {
+        const productId = container.id.split('-')[1];
+        const icon = container.querySelector('.prediction-icon');
+        const status = container.querySelector('.prediction-status');
+
+        fetch(`/api/inventory/predict/${productId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    icon.classList.add('text-muted');
+                    return;
+                }
+                icon.setAttribute('data-bs-original-title', data.message);
+                status.textContent = `${data.prediction} needed`;
+                icon.classList.add(data.confidence >= 70 ? 'text-success' : data.confidence >= 40 ? 'text-warning' : 'text-danger');
+            })
+            .catch(() => icon.classList.add('text-muted'));
+    });
+});
+</script>
+{% endblock %}
